@@ -1,4 +1,8 @@
+
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 public class NodeManager {
 
@@ -21,6 +25,81 @@ public class NodeManager {
         // Есали корень не null, то ищем для него место в дереве
         return getNext(this.root, value);
     }
+
+    public Node get(Integer value) throws NoSuchElementException {
+        return get(root, value);
+    }
+
+    public Node getMax(){
+        return getMaxMin(true);
+    }
+
+    public Node getMin(){
+        return getMaxMin(false);
+    }
+
+    public List<Integer> getGreaterThen(Integer value) {
+        List<Integer> rezult = new ArrayList<Integer>();
+        Node node;
+        try {
+            node = get(value);
+        } catch (NoSuchElementException e) {
+            return rezult;
+        }
+
+        //rezult.add(node.getValue());
+        do {
+            node = node.getRight();
+            if (node != null) {
+                rezult.add(node.getValue());
+            }
+        } while (node != null);
+        return rezult;
+    }
+
+    private Node getMaxMin(boolean isMax){
+        Node node = null, next = root;
+        do {
+            node = next;
+            if (isMax) {
+                next = node.getRight();
+            } else {
+                next = node.getLeft();
+            }
+        } while (next != null);
+        return node;
+    }
+
+
+
+    private Node get(Node node, Integer value) throws NoSuchElementException {
+        Direction direction = getDirection(value, node);
+        switch (direction) {
+            // Если новое положение слева
+            case LEFT: {
+                // Проверяем у текущей ноды в дереве, свободно ли
+                // у нее место слева
+                if (node.getLeft() != null) {
+                    // Если место не свободно, то рекурсивно вызываем
+                    // этот же метод, нов качестве корня передаем следующую ноду
+                    // расположенную СЛЕВА
+                    return get(node.getLeft(), value);
+                } else {
+                    throw new NoSuchElementException("");
+                }
+            }
+            case RIGHT: {
+                if (node.getRight() != null) {
+                    return get(node.getRight(), value);
+                } else {
+                    throw new NoSuchElementException("");
+                }
+            }
+            default: return node;
+        }
+
+    }
+
 
     /**
      *
